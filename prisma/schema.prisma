@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int         @id @default(autoincrement())
+  name          String      @db.VarChar(255)
+  email         String      @unique
+  password      String      @db.VarChar(255)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime?   
+  deletedAt     DateTime?   
+
+  userHasRoles  UserHasRole[]
+
+}
+
+model Role {
+  id            Int          @id @default(autoincrement())
+  name          String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime?   
+  deletedAt     DateTime?   
+
+  userHasRoles  UserHasRole[]
+}
+
+model UserHasRole {
+  id            Int     @id @default(autoincrement())
+  user_id       Int
+  role_id       Int
+  user          User    @relation(fields: [user_id], references: [id])
+  role          Role    @relation(fields: [role_id], references: [id])
+  
+  @@unique([user_id, role_id])
+}
+
+model Education {
+  id            Int          @id @default(autoincrement())
+  name          String
+  degree        String
+  study         String
+  startDate     DateTime     @db.Date
+  endDate       DateTime     @db.Date
+  description   String?       @db.Text
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime?   
+  deletedAt     DateTime?   
+}
+
+model EmploymentType {
+  id            Int          @id @default(autoincrement())
+  name          String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime?   
+  deletedAt     DateTime?
+  experiences  Experience[]   
+}
+
+model Experience {
+  id                Int             @id @default(autoincrement())
+  employmentType    EmploymentType  @relation(fields: [employmenttype_id], references: [id])
+  employmenttype_id Int     
+  title             String
+  company_name      String
+  industry          String
+  location          String
+  type              String
+  current_work      Boolean          
+  startDate         DateTime         @db.Date
+  endDate           DateTime?        @db.Date
+  description       String?          @db.Text
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime?   
+  deletedAt         DateTime?   
+}
